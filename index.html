@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>~~* SAUNA CAMP *~~</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+  body {
+    background-color: #000080;
+    background-image: radial-gradient(circle, #000060 1px, transparent 1px);
+    background-size: 20px 20px;
+    color: #ffff00;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px;
+    padding: 20px;
+    margin: 0;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-family: 'Press Start 2P', monospace;
+    color: #ff6600;
+    text-shadow: 4px 4px #ff0000, -1px -1px #ffaa00;
+    font-size: 1.6em;
+    text-align: center;
+    margin-bottom: 4px;
+    line-height: 1.5;
+  }
+
+  h2 {
+    font-family: 'Press Start 2P', monospace;
+    color: #00ff00;
+    font-size: 0.75em;
+    border-bottom: 2px solid #00ff00;
+    padding-bottom: 6px;
+  }
+
+  .subtitle {
+    text-align: center;
+    color: #00ffff;
+    font-size: 12px;
+    margin-bottom: 10px;
+    letter-spacing: 3px;
+  }
+
+  .marquee-bar {
+    background: #003300;
+    border-top: 2px solid #00ff00;
+    border-bottom: 2px solid #00ff00;
+    padding: 5px 0;
+    color: #00ff00;
+    font-weight: bold;
+    overflow: hidden;
+    white-space: nowrap;
+    margin: 10px 0;
+  }
+
+  .marquee-inner {
+    display: inline-block;
+    animation: scroll-left 18s linear infinite;
+  }
+
+  @keyframes scroll-left {
+    0%   { transform: translateX(100vw); }
+    100% { transform: translateX(-100%); }
+  }
+
+  hr {
+    border: none;
+    border-top: 3px double #00ff00;
+    margin: 18px 0;
+  }
+
+  .blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  /* ---- FORM ---- */
+  form {
+    background: #000040;
+    border: 3px solid #00ff00;
+    box-shadow: 4px 4px 0 #006600;
+    padding: 20px;
+    margin: 16px 0;
+  }
+
+  label {
+    display: block;
+    color: #00ff00;
+    margin: 14px 0 4px;
+    font-weight: bold;
+    font-size: 13px;
+  }
+
+  input[type="text"],
+  select {
+    background: #000000;
+    color: #00ff00;
+    border: 2px solid #00aa00;
+    padding: 6px 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    outline: none;
+  }
+
+  input[type="text"]:focus,
+  select:focus {
+    border-color: #00ff00;
+    box-shadow: 0 0 6px #00ff00;
+  }
+
+  select option {
+    background: #000000;
+  }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    color: #ffff00;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #ff6600;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .submit-btn {
+    display: block;
+    width: 100%;
+    margin-top: 18px;
+    background: #ff6600;
+    color: #000000;
+    border: 3px solid #ffaa00;
+    padding: 12px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.65em;
+    font-weight: bold;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    box-shadow: 4px 4px 0 #aa3300;
+    transition: transform 0.1s, box-shadow 0.1s;
+  }
+
+  .submit-btn:hover {
+    background: #ffaa00;
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #aa3300;
+  }
+
+  .submit-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 2px 2px 0 #aa3300;
+  }
+
+  #status-msg {
+    min-height: 22px;
+    font-weight: bold;
+    font-size: 13px;
+    margin: 8px 0;
+    padding: 6px;
+    text-align: center;
+  }
+
+  .status-ok  { color: #00ff00; background: #003300; border: 1px solid #00ff00; }
+  .status-err { color: #ff4444; background: #330000; border: 1px solid #ff0000; }
+  .status-inf { color: #ffff00; }
+
+  /* ---- TABLE SECTION ---- */
+  #signups-table {
+    margin-top: 10px;
+  }
+
+  .date-block {
+    margin-bottom: 24px;
+  }
+
+  .date-header {
+    background: #002200;
+    border: 2px solid #ff6600;
+    padding: 8px 12px;
+    color: #ff6600;
+    font-weight: bold;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .funded   { color: #ff6600; font-weight: bold; }
+  .unfunded { color: #ffff00; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0;
+  }
+
+  th {
+    background: #003300;
+    color: #00ff00;
+    border: 2px solid #006600;
+    padding: 7px 10px;
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  td {
+    border: 1px solid #004400;
+    padding: 6px 10px;
+    color: #ccffcc;
+    font-size: 13px;
+  }
+
+  tr:nth-child(even) td { background: #001100; }
+  tr:nth-child(odd)  td { background: #000800; }
+
+  .empty-msg {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+    border: 1px dashed #333;
+  }
+
+  .counter {
+    text-align: right;
+    color: #666;
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+  /* ---- FOOTER ---- */
+  .footer {
+    text-align: center;
+    margin-top: 30px;
+    color: #003399;
+    font-size: 11px;
+    border-top: 1px solid #003399;
+    padding-top: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <h1>~~* SAUNA CAMP *~~</h1>
+  <p class="subtitle">:: WOOD-FIRED &nbsp;·&nbsp; COMMUNITY &nbsp;·&nbsp; SWEATY ::</p>
+
+  <div class="marquee-bar">
+    <span class="marquee-inner">
+      🔥 WELCOME TO SAUNA CAMP 🔥 &nbsp;&nbsp;&nbsp;
+      SIGN UP BELOW TO CLAIM YOUR SPOT &nbsp;&nbsp;&nbsp;
+      🪵 FIREWOOD DONATIONS APPRECIATED 🪵 &nbsp;&nbsp;&nbsp;
+      HELP WITH SETUP OR TAKEDOWN &nbsp;&nbsp;&nbsp;
+      🧖 GET SWEATY WITH FRIENDS 🧖 &nbsp;&nbsp;&nbsp;
+    </span>
+  </div>
+
+  <hr>
+
+  <h2>[ SIGN UP ]</h2>
+
+  <form id="signup-form" autocomplete="off">
+    <label for="name">YOUR NAME:</label>
+    <input type="text" id="name" name="name" required placeholder="e.g. Hot Steve" maxlength="80">
+
+    <label for="event_date">WHICH DATE ARE YOU COMING:</label>
+    <select id="event_date" name="event_date" required>
+      <option value="">-- pick a date --</option>
+      <option value="2026-05-10">Sunday, May 10 2026</option>
+      <option value="2026-05-17">Sunday, May 17 2026</option>
+      <option value="2026-05-24">Sunday, May 24 2026</option>
+      <option value="2026-05-31">Sunday, May 31 2026</option>
+    </select>
+
+    <label for="helping">I CAN HELP WITH:</label>
+    <select id="helping" name="helping" required>
+      <option value="">-- choose one --</option>
+      <option value="setup">Setup</option>
+      <option value="takedown">Takedown</option>
+      <option value="both">Both</option>
+      <option value="neither">Just showing up (that's ok too)</option>
+    </select>
+
+    <label class="checkbox-row">
+      <input type="checkbox" id="firewood_donation" name="firewood_donation">
+      YES, I'LL DONATE $15 FOR FIREWOOD 🪵
+    </label>
+
+    <button type="submit" class="submit-btn">*** SIGN ME UP ***</button>
+  </form>
+
+  <div id="status-msg"></div>
+
+  <hr>
+
+  <h2>[ WHO'S COMING ]</h2>
+
+  <div id="signups-table">
+    <p class="empty-msg"><span class="blink">▌</span> Loading...</p>
+  </div>
+
+  <div class="footer">
+    Best viewed in Netscape Navigator 4.0 at 800x600 &nbsp;·&nbsp;
+    You are visitor #<span id="visitor-count">???</span>
+    &nbsp;·&nbsp; <span class="blink">●</span> LIVE
+  </div>
+
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+//  CONFIG — replace these with your actual values
+//  (or set them server-side before serving this file)
+// ─────────────────────────────────────────────
+const SUPABASE_URL      = 'YOUR_SUPABASE_URL';       // e.g. https://xxxx.supabase.co
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';  // public anon key
+
+// ─────────────────────────────────────────────
+//  Supabase REST helpers
+// ─────────────────────────────────────────────
+const BASE_HEADERS = {
+  'apikey': SUPABASE_ANON_KEY,
+  'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+  'Content-Type': 'application/json',
+};
+
+async function fetchSignups() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/signups?select=*&order=event_date.asc,created_at.asc`,
+    { headers: BASE_HEADERS }
+  );
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  return res.json();
+}
+
+async function insertSignup(row) {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/signups`, {
+    method: 'POST',
+    headers: { ...BASE_HEADERS, 'Prefer': 'return=minimal' },
+    body: JSON.stringify(row),
+  });
+  if (!res.ok) {
+    const msg = await res.text();
+    throw new Error(msg || `HTTP ${res.status}`);
+  }
+}
+
+// ─────────────────────────────────────────────
+//  Rendering
+// ─────────────────────────────────────────────
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function fmtDate(dateStr) {
+  // dateStr is YYYY-MM-DD
+  const [y, m, d] = dateStr.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  return dt.toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+}
+
+const HELPING_LABELS = {
+  setup:    'Setup',
+  takedown: 'Takedown',
+  both:     'Setup + Takedown',
+  neither:  'Just attending',
+};
+
+function renderSignups(signups) {
+  const container = document.getElementById('signups-table');
+
+  if (!signups.length) {
+    container.innerHTML = '<p class="empty-msg">No signups yet — BE THE FIRST! 👆</p>';
+    return;
+  }
+
+  // group by date
+  const byDate = {};
+  for (const s of signups) {
+    if (!byDate[s.event_date]) byDate[s.event_date] = [];
+    byDate[s.event_date].push(s);
+  }
+
+  let html = '';
+  for (const [date, entries] of Object.entries(byDate)) {
+    const donationCount  = entries.filter(e => e.firewood_donation).length;
+    const totalDonations = donationCount * 15;
+    const needed         = Math.max(0, 15 - totalDonations);
+    const firewoodHtml   = totalDonations >= 15
+      ? `<span class="funded">🔥 FUNDED ($${totalDonations} raised)</span>`
+      : `<span class="unfunded">🪵 needs $${needed} more (${totalDonations > 0 ? '$' + totalDonations + ' raised' : 'nothing yet'})</span>`;
+
+    const rows = entries.map(e => `
+      <tr>
+        <td>${escHtml(e.name)}</td>
+        <td>${escHtml(HELPING_LABELS[e.helping] || e.helping)}</td>
+        <td style="text-align:center">${e.firewood_donation ? '✅ $15' : '—'}</td>
+      </tr>`).join('');
+
+    html += `
+      <div class="date-block">
+        <div class="date-header">
+          <span>📅 ${fmtDate(date)}</span>
+          <span>FIREWOOD: ${firewoodHtml}</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Helping With</th>
+              <th>Firewood $</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="counter">${entries.length} attendee${entries.length !== 1 ? 's' : ''}</div>
+      </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ─────────────────────────────────────────────
+//  Status messages
+// ─────────────────────────────────────────────
+function setStatus(msg, type) {
+  const el = document.getElementById('status-msg');
+  el.textContent = msg;
+  el.className = type === 'ok' ? 'status-ok' : type === 'err' ? 'status-err' : 'status-inf';
+}
+
+// ─────────────────────────────────────────────
+//  Load + auto-refresh
+// ─────────────────────────────────────────────
+async function loadAndRender() {
+  try {
+    const signups = await fetchSignups();
+    renderSignups(signups);
+  } catch (err) {
+    document.getElementById('signups-table').innerHTML =
+      `<p class="empty-msg" style="color:#ff4444">⚠️ Could not load signups: ${escHtml(err.message)}</p>`;
+  }
+}
+
+loadAndRender();
+setInterval(loadAndRender, 30_000); // refresh every 30s
+
+// ─────────────────────────────────────────────
+//  Form submit
+// ─────────────────────────────────────────────
+document.getElementById('signup-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+
+  const row = {
+    name:              form.name.value.trim(),
+    event_date:        form.event_date.value,
+    helping:           form.helping.value,
+    firewood_donation: form.firewood_donation.checked,
+  };
+
+  setStatus('Submitting...', 'inf');
+  form.querySelector('.submit-btn').disabled = true;
+
+  try {
+    await insertSignup(row);
+    setStatus("✅ YOU'RE IN! See you at the sauna! 🔥", 'ok');
+    form.reset();
+    await loadAndRender();
+  } catch (err) {
+    setStatus(`❌ Error: ${err.message}`, 'err');
+  } finally {
+    form.querySelector('.submit-btn').disabled = false;
+  }
+});
+
+// fake visitor counter for vibes
+document.getElementById('visitor-count').textContent =
+  (Math.floor(Math.random() * 8000) + 1337).toLocaleString();
+</script>
+</body>
+</html>
