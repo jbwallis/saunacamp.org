@@ -3,431 +3,493 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>~~* SAUNA CAMP *~~</title>
+<title>🔥 sauna camp</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
-
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
-  body {
-    background-color: #000080;
-    background-image: radial-gradient(circle, #000060 1px, transparent 1px);
-    background-size: 20px 20px;
-    color: #ffff00;
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 14px;
-    padding: 20px;
-    margin: 0;
-  }
+/* ── CSS custom property for rotating holo angle ── */
+@property --holo-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
 
-  .container {
-    max-width: 820px;
-    margin: 0 auto;
-  }
+:root {
+  --green:     #39FF14;
+  --green-dim: #1c7a08;
+  --bg:        #080808;
+  --panel:     #0d0d0d;
+}
 
-  h1 {
-    font-family: 'Press Start 2P', monospace;
-    color: #ff6600;
-    text-shadow: 4px 4px #ff0000, -1px -1px #ffaa00;
-    font-size: clamp(0.7em, 5vw, 1.6em);
-    text-align: center;
-    margin-bottom: 4px;
-    line-height: 1.5;
-    white-space: nowrap;
-  }
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  h2 {
-    font-family: 'Press Start 2P', monospace;
-    color: #00ff00;
-    font-size: 0.75em;
-    border-bottom: 2px solid #00ff00;
-    padding-bottom: 6px;
-  }
+body {
+  background: var(--bg);
+  color: var(--green);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 14px;
+  padding: 24px 20px 48px;
+  min-height: 100vh;
+}
 
-  .subtitle {
-    text-align: center;
-    color: #00ffff;
-    font-size: 12px;
-    margin-bottom: 10px;
-    letter-spacing: 3px;
-  }
+.container {
+  max-width: 780px;
+  margin: 0 auto;
+}
 
-  .marquee-bar {
-    background: #003300;
-    border-top: 2px solid #00ff00;
-    border-bottom: 2px solid #00ff00;
-    padding: 5px 0;
-    color: #00ff00;
-    font-weight: bold;
-    overflow: hidden;
-    white-space: nowrap;
-    margin: 10px 0;
-  }
+/* ── HOLOGRAPHIC BORDER MIXIN ─────────────────────
+   Wrap any element in .holo-wrap and the child gets
+   a rotating rainbow border, used sparingly below.
+──────────────────────────────────────────────────── */
+.holo-wrap {
+  position: relative;
+  display: block;
+  border-radius: 4px;
+}
+.holo-wrap::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 6px;
+  background: conic-gradient(
+    from var(--holo-angle),
+    #ff0000, #ff6600, #ffff00,
+    #39FF14, #00ffff, #0066ff,
+    #cc00ff, #ff0066, #ff0000
+  );
+  animation: holo-spin 4s linear infinite;
+  z-index: 0;
+}
+.holo-wrap > * { position: relative; z-index: 1; }
 
-  .marquee-inner {
-    display: inline-block;
-    animation: scroll-left 18s linear infinite;
-  }
+@keyframes holo-spin {
+  to { --holo-angle: 360deg; }
+}
 
-  @keyframes scroll-left {
-    0%   { transform: translateX(100vw); }
-    100% { transform: translateX(-100%); }
-  }
+/* ── LOGO / HEADER ── */
+.logo-block {
+  text-align: center;
+  margin-bottom: 28px;
+}
 
-  hr {
-    border: none;
-    border-top: 3px double #00ff00;
-    margin: 18px 0;
-  }
+.sticker {
+  display: inline-block;
+  background: #000;
+  border-radius: 18px;
+  padding: 18px 22px 14px;
+  margin-bottom: 16px;
+  position: relative;
+}
 
-  .blink {
-    animation: blink 1s step-end infinite;
-  }
+.sticker {
+  border: 2px solid var(--green);
+  box-shadow: 0 0 18px rgba(57,255,20,0.25);
+}
 
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-  }
+.kanji {
+  font-size: 2.4em;
+  font-weight: 900;
+  font-family: 'Courier New', monospace;
+  color: var(--green);
+  letter-spacing: 2px;
+  display: block;
+  line-height: 1.2;
+  text-shadow: 0 0 12px rgba(57,255,20,0.5);
+}
 
-  /* ---- FORM ---- */
-  form {
-    background: #000040;
-    border: 3px solid #00ff00;
-    box-shadow: 4px 4px 0 #006600;
-    padding: 20px;
-    margin: 16px 0;
-  }
+.sticker-label {
+  font-size: 0.95em;
+  color: var(--green);
+  letter-spacing: 3px;
+  text-transform: lowercase;
+  font-weight: bold;
+}
 
-  label {
-    display: block;
-    color: #00ff00;
-    margin: 14px 0 4px;
-    font-weight: bold;
-    font-size: 13px;
-  }
+h1 {
+  font-family: 'Press Start 2P', monospace;
+  color: var(--green);
+  font-size: clamp(0.7em, 4.5vw, 1.4em);
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 0 20px rgba(57,255,20,0.6);
+  margin-bottom: 6px;
+}
 
-  input[type="text"],
-  input[type="number"],
-  select {
-    background: #000000;
-    color: #00ff00;
-    border: 2px solid #00aa00;
-    padding: 6px 8px;
-    font-family: 'Courier New', monospace;
-    font-size: 14px;
-    width: 100%;
-    box-sizing: border-box;
-    outline: none;
-  }
+.subtitle {
+  text-align: center;
+  color: var(--green-dim);
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
 
-  input[type="text"]:focus,
-  input[type="number"]:focus,
-  select:focus {
-    border-color: #00ff00;
-    box-shadow: 0 0 6px #00ff00;
-  }
+/* ── MARQUEE ── */
+.marquee-bar {
+  border-top: 1px solid var(--green-dim);
+  border-bottom: 1px solid var(--green-dim);
+  padding: 5px 0;
+  color: var(--green);
+  font-size: 12px;
+  overflow: hidden;
+  white-space: nowrap;
+  margin: 0 0 24px;
+}
+.marquee-inner {
+  display: inline-block;
+  animation: scroll-left 22s linear infinite;
+}
+@keyframes scroll-left {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 
-  select option {
-    background: #000000;
-  }
+hr {
+  border: none;
+  border-top: 1px solid var(--green-dim);
+  margin: 24px 0;
+}
 
-  .checkbox-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 14px;
-    color: #ffff00;
-    font-size: 13px;
-    font-weight: bold;
-    cursor: pointer;
-  }
+/* ── SECTION HEADINGS ── */
+h2 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6em;
+  color: var(--green);
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+  text-shadow: 0 0 8px rgba(57,255,20,0.4);
+}
 
-  input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: #ff6600;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
+/* ── FORM ── */
+.form-inner {
+  background: var(--panel);
+  padding: 22px;
+  border: 1px solid var(--green);
+  border-radius: 6px;
+  box-shadow: 0 0 14px rgba(57,255,20,0.15);
+}
 
-  #firewood-amount-row {
-    display: none;
-    margin-top: 10px;
-  }
+label {
+  display: block;
+  color: var(--green-dim);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 16px 0 5px;
+  font-weight: bold;
+}
 
-  #firewood-amount-row.visible {
-    display: block;
-  }
+input[type="text"],
+input[type="number"],
+select {
+  background: #000;
+  color: var(--green);
+  border: 1px solid var(--green-dim);
+  border-bottom: 2px solid var(--green);
+  padding: 8px 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+::placeholder { color: var(--green); opacity: 1; }
+input:focus, select:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(57,255,20,0.25);
+}
+select option { background: #000; }
 
-  .submit-btn {
-    display: block;
-    width: 100%;
-    margin-top: 18px;
-    background: #ff6600;
-    color: #000000;
-    border: 3px solid #ffaa00;
-    padding: 12px;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 0.65em;
-    font-weight: bold;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    box-shadow: 4px 4px 0 #aa3300;
-    transition: transform 0.1s, box-shadow 0.1s;
-  }
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  color: var(--green);
+  font-size: 13px;
+  font-weight: bold;
+}
+input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: var(--green);
+  flex-shrink: 0;
+}
 
-  .submit-btn:hover {
-    background: #ffaa00;
-    transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0 #aa3300;
-  }
+#firewood-amount-row { display: none; margin-top: 10px; }
+#firewood-amount-row.visible { display: block; }
+#brings-firewood-row { display: none; margin-top: 14px; }
+#helping-other-row   { display: none; margin-top: 8px; }
 
-  .submit-btn:active {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 2px 0 #aa3300;
-  }
+/* ── SUBMIT BUTTON — holo on hover ── */
+.submit-wrap {
+  margin-top: 22px;
+  border-radius: 3px;
+}
+.submit-wrap::before { opacity: 1; border-radius: 5px; }
 
-  #status-msg {
-    min-height: 22px;
-    font-weight: bold;
-    font-size: 13px;
-    margin: 8px 0;
-    padding: 6px;
-    text-align: center;
-  }
+.submit-btn {
+  display: block;
+  width: 100%;
+  background: #000;
+  color: var(--green);
+  border: 2px solid var(--green);
+  padding: 14px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.6em;
+  letter-spacing: 3px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.submit-btn:hover {
+  background: rgba(57,255,20,0.08);
+  box-shadow: 0 0 20px rgba(57,255,20,0.3);
+}
+.submit-btn:disabled { opacity: 0.4; }
 
-  .status-ok  { color: #00ff00; background: #003300; border: 1px solid #00ff00; }
-  .status-err { color: #ff4444; background: #330000; border: 1px solid #ff0000; }
-  .status-inf { color: #ffff00; }
+#status-msg {
+  min-height: 20px;
+  font-size: 12px;
+  text-align: center;
+  padding: 6px;
+  margin: 8px 0;
+  letter-spacing: 1px;
+}
+.status-ok  { color: var(--green); }
+.status-err { color: #ff4444; }
+.status-inf { color: var(--green-dim); }
 
-  /* ---- TABLE SECTION ---- */
-  #signups-table {
-    margin-top: 10px;
-  }
+/* ── TABLE ── */
+#signups-table { margin-top: 8px; }
+.date-block {
+  margin-bottom: 28px;
+  border: 1px solid var(--green);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 0 14px rgba(57,255,20,0.15);
+}
 
-  .date-block {
-    margin-bottom: 24px;
-  }
+.date-header {
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 0;
+  background: rgba(57,255,20,0.04);
+}
 
-  .date-header {
-    background: #002200;
-    border: 2px solid #ff6600;
-    padding: 8px 12px;
-    color: #ff6600;
-    font-weight: bold;
-    font-size: 13px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
+.funded   { color: var(--green); text-shadow: 0 0 8px rgba(57,255,20,0.5); }
+.unfunded { color: #666; }
 
-  .funded   { color: #ff6600; font-weight: bold; }
-  .unfunded { color: #ffff00; }
+table { width: 100%; border-collapse: collapse; border: 1px solid #1e3a1a; }
+th {
+  color: var(--green);
+  background: #0a150a;
+  border: 1px solid #1e3a1a;
+  padding: 7px 10px;
+  text-align: left;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+td {
+  border: 1px solid #1a2e18;
+  padding: 7px 10px;
+  color: #aaa;
+  font-size: 13px;
+}
+td:last-child { color: var(--green-dim); font-size: 11px; }
+tr:hover td { background: rgba(57,255,20,0.04); color: var(--green); }
+tr:hover td:last-child { color: var(--green-dim); }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 0;
-  }
+.empty-msg {
+  color: #333;
+  text-align: center;
+  padding: 24px;
+  border: 1px dashed #222;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
 
-  th {
-    background: #003300;
-    color: #00ff00;
-    border: 2px solid #006600;
-    padding: 7px 10px;
-    text-align: left;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
+/* ── FOOTER ── */
+.footer {
+  text-align: center;
+  margin-top: 40px;
+  color: #222;
+  font-size: 11px;
+  border-top: 1px solid #111;
+  padding-top: 14px;
+}
 
-  td {
-    border: 1px solid #004400;
-    padding: 6px 10px;
-    color: #ccffcc;
-    font-size: 13px;
-  }
+/* ── ADMIN MODAL ── */
+#admin-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+#admin-modal.open { display: flex; }
+#admin-box {
+  background: #000;
+  border: 2px solid var(--green);
+  box-shadow: 0 0 40px rgba(57,255,20,0.2);
+  padding: 24px;
+  width: 90%;
+  max-width: 400px;
+}
+#admin-box h3 {
+  font-family: 'Press Start 2P', monospace;
+  color: var(--green);
+  font-size: 0.5em;
+  margin: 0 0 16px;
+  letter-spacing: 2px;
+}
+.admin-option-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.admin-option-row input {
+  flex: 1;
+  background: #000;
+  color: var(--green);
+  border: 1px solid var(--green-dim);
+  padding: 5px 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+.admin-option-row button {
+  background: #000;
+  color: #ff4444;
+  border: 1px solid #440000;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-family: 'Courier New', monospace;
+}
+.admin-btn {
+  background: #000;
+  color: var(--green);
+  border: 1px solid var(--green-dim);
+  padding: 7px 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  cursor: pointer;
+  margin-top: 10px;
+  margin-right: 8px;
+}
+.admin-btn:hover { border-color: var(--green); }
+#admin-add-btn {
+  background: none;
+  color: #444;
+  border: 1px dashed #333;
+  padding: 5px 12px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  width: 100%;
+}
 
-  tr:nth-child(even) td { background: #001100; }
-  tr:nth-child(odd)  td { background: #000800; }
-
-  .empty-msg {
-    color: #666;
-    font-style: italic;
-    text-align: center;
-    padding: 20px;
-    border: 1px dashed #333;
-  }
-
-  /* ---- ADMIN MODAL ---- */
-  #admin-modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.88);
-    z-index: 9999;
-    align-items: center;
-    justify-content: center;
-  }
-  #admin-modal.open { display: flex; }
-  #admin-box {
-    background: #000040;
-    border: 3px solid #00ff00;
-    box-shadow: 0 0 30px #00ff00;
-    padding: 24px;
-    width: 90%;
-    max-width: 400px;
-    font-family: 'Courier New', monospace;
-  }
-  #admin-box h3 {
-    font-family: 'Press Start 2P', monospace;
-    color: #00ff00;
-    font-size: 0.55em;
-    margin: 0 0 16px;
-  }
-  .admin-option-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-  .admin-option-row input {
-    flex: 1;
-    background: #000;
-    color: #00ff00;
-    border: 1px solid #006600;
-    padding: 5px 8px;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-  }
-  .admin-option-row button {
-    background: #330000;
-    color: #ff4444;
-    border: 1px solid #660000;
-    padding: 4px 10px;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    cursor: pointer;
-  }
-  .admin-btn {
-    background: #003300;
-    color: #00ff00;
-    border: 2px solid #00ff00;
-    padding: 7px 14px;
-    font-family: 'Courier New', monospace;
-    font-size: 13px;
-    cursor: pointer;
-    margin-top: 10px;
-    margin-right: 8px;
-  }
-  .admin-btn:hover { background: #005500; }
-  #admin-add-btn {
-    background: none;
-    color: #ffff00;
-    border: 1px dashed #666;
-    padding: 5px 12px;
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    cursor: pointer;
-    margin-bottom: 12px;
-    width: 100%;
-  }
-
-  /* ---- FOOTER ---- */
-  .footer {
-    text-align: center;
-    margin-top: 30px;
-    color: #003399;
-    font-size: 11px;
-    border-top: 1px solid #003399;
-    padding-top: 12px;
-  }
+.blink {
+  animation: blink 1s step-end infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
 </style>
 </head>
 <body>
 <div class="container">
 
-  <h1>~~* SAUNA CAMP *~~</h1>
-  <p class="subtitle">:: WOOD-FIRED &nbsp;·&nbsp; COMMUNITY &nbsp;·&nbsp; SWEATY ::</p>
+  <!-- LOGO -->
+  <div class="logo-block">
+    <div class="sticker">
+      <span class="kanji">触摸喷水!</span>
+      <span class="sticker-label">sauna camp</span>
+    </div>
+  </div>
 
   <div class="marquee-bar">
     <span class="marquee-inner">
-      🔥 WELCOME TO SAUNA CAMP 🔥 &nbsp;&nbsp;&nbsp;
-      SIGN UP BELOW TO CLAIM YOUR SPOT &nbsp;&nbsp;&nbsp;
-      🪵 FIREWOOD DONATIONS APPRECIATED 🪵 &nbsp;&nbsp;&nbsp;
-      HELP WITH SETUP OR TAKEDOWN &nbsp;&nbsp;&nbsp;
-      🧖 GET SWEATY WITH FRIENDS 🧖 &nbsp;&nbsp;&nbsp;
+      🔥 WOOD-FIRED BEACH SAUNA 🔥 &nbsp;·&nbsp; TAKE A FIT WAYMO TO THE BEACH &nbsp;·&nbsp; HELP WITH SETUP OR TAKEDOWN &nbsp;·&nbsp; 🪵 FIREWOOD DONATIONS APPRECIATED 🪵 &nbsp;·&nbsp; GET HOT. GET COLD. REPEAT. &nbsp;·&nbsp; 🔥 WOOD-FIRED BEACH SAUNA 🔥 &nbsp;·&nbsp; TAKE A FIT WAYMO TO THE BEACH &nbsp;·&nbsp; HELP WITH SETUP OR TAKEDOWN &nbsp;·&nbsp; 🪵 FIREWOOD DONATIONS APPRECIATED 🪵 &nbsp;·&nbsp; GET HOT. GET COLD. REPEAT. &nbsp;·&nbsp;
     </span>
   </div>
 
-  <hr>
-
   <h2>[ SIGN UP ]</h2>
 
-  <form id="signup-form" autocomplete="off">
-    <label for="name">YOUR NAME:</label>
-    <input type="text" id="name" name="name" required placeholder="e.g. Mr. Ant" maxlength="80">
+  <div style="margin-bottom:8px;">
+    <div class="form-inner">
+      <form id="signup-form" autocomplete="off">
+        <label for="name">YOUR NAME</label>
+        <input type="text" id="name" name="name" required placeholder="e.g. Mr. Ant" maxlength="80">
 
-    <label for="event_date">WHICH CAMP ARE YOU COMING TO:</label>
-    <select id="event_date" name="event_date" required></select>
+        <label for="event_date">WHICH CAMP ARE YOU COMING TO</label>
+        <select id="event_date" name="event_date" required></select>
 
-    <label for="helping">I CAN HELP WITH:</label>
-    <select id="helping" name="helping" required>
-      <option value="">-- choose one --</option>
-      <option value="setup">setup</option>
-      <option value="takedown">takedown</option>
-      <option value="both">both</option>
-      <option value="other">something else</option>
-    </select>
+        <label for="helping">I CAN HELP WITH</label>
+        <select id="helping" name="helping" required>
+          <option value="">-- choose one --</option>
+          <option value="setup">setup</option>
+          <option value="takedown">takedown</option>
+          <option value="both">both</option>
+          <option value="other">something else</option>
+        </select>
 
-    <div id="helping-other-row" style="display:none; margin-top:8px;">
-      <input type="text" id="helping_other" placeholder="what can you help with?" maxlength="120">
+        <div id="helping-other-row">
+          <input type="text" id="helping_other" placeholder="what can you help with?" maxlength="120">
+        </div>
+
+        <div id="brings-firewood-row">
+          <label class="checkbox-row">
+            <input type="checkbox" id="brings_firewood">
+            YES, I'LL BRING FIREWOOD 🪵
+          </label>
+        </div>
+
+        <label class="checkbox-row" style="margin-top:16px;">
+          <input type="checkbox" id="firewood_donation">
+          YES, I'LL DONATE TOWARD FIREWOOD 🪵
+        </label>
+
+        <div id="firewood-amount-row">
+          <label for="firewood_amount">DONATION AMOUNT ($)</label>
+          <input type="number" id="firewood_amount" min="1" placeholder="15">
+          <div style="color:#39ff14; opacity:0.5; font-size:11px; margin-top:5px; letter-spacing:1px;">venmo @JackWallis</div>
+        </div>
+
+        <div class="holo-wrap submit-wrap">
+          <button type="submit" class="submit-btn">*** SIGN ME UP ***</button>
+        </div>
+      </form>
+      <div id="status-msg"></div>
     </div>
-
-    <div id="brings-firewood-row" style="display:none; margin-top:14px;">
-      <label class="checkbox-row">
-        <input type="checkbox" id="brings_firewood" name="brings_firewood">
-        YES, I'LL BRING FIREWOOD 🪵
-      </label>
-    </div>
-
-    <label class="checkbox-row" style="margin-top:14px;">
-      <input type="checkbox" id="firewood_donation" name="firewood_donation">
-      YES, I'LL DONATE TOWARD FIREWOOD 🪵
-    </label>
-
-    <div id="firewood-amount-row">
-      <label for="firewood_amount">DONATION AMOUNT ($):</label>
-      <input type="number" id="firewood_amount" name="firewood_amount" min="1" placeholder="15">
-      <div style="color:#ff6600; font-size:11px; margin-top:5px;">venmo @JackWallis</div>
-    </div>
-
-    <button type="submit" class="submit-btn">*** SIGN ME UP ***</button>
-  </form>
-
-  <div id="status-msg"></div>
+  </div>
 
   <hr>
 
   <h2>[ SUPPORT LOG ]</h2>
-
   <div id="signups-table">
-    <p class="empty-msg"><span class="blink">▌</span> Loading...</p>
+    <p class="empty-msg"><span class="blink">▌</span> LOADING</p>
   </div>
 
   <div class="footer">
-    <span class="blink" id="live-dot" style="cursor:default; padding: 8px; user-select:none; -webkit-user-select:none;">●</span> LIVE
+    <span class="blink" id="live-dot" style="cursor:default; padding:8px; user-select:none; -webkit-user-select:none;">●</span> LIVE
   </div>
 
   <!-- admin modal -->
   <div id="admin-modal">
     <div id="admin-box">
-      <h3>[ ADMIN ] EVENT DATES</h3>
+      <h3>[ ADMIN ]</h3>
       <div id="admin-options"></div>
-      <button id="admin-add-btn" onclick="adminAddRow()">+ ADD DATE</button>
-      <br>
+      <button id="admin-add-btn" onclick="adminAddRow()">+ ADD DATE</button><br>
       <button class="admin-btn" onclick="adminSave()">SAVE</button>
       <button class="admin-btn" onclick="adminClose()">CANCEL</button>
     </div>
@@ -436,15 +498,8 @@
 </div>
 
 <script>
-// ─────────────────────────────────────────────
-//  CONFIG — replace these with your actual values
-// ─────────────────────────────────────────────
 const SUPABASE_URL      = 'https://ixdsojtdqwcrlgstsbcg.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_GtZd5Nu8XrcBIfgYp35s3w_6aUC3LK2';
-
-// ─────────────────────────────────────────────
-//  Supabase REST helpers
-// ─────────────────────────────────────────────
 const BASE_HEADERS = {
   'apikey': SUPABASE_ANON_KEY,
   'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
@@ -452,171 +507,110 @@ const BASE_HEADERS = {
 };
 
 async function fetchSignups() {
-  const res = await fetch(
-    `${SUPABASE_URL}/rest/v1/signups?select=*&order=event_date.asc,created_at.asc`,
-    { headers: BASE_HEADERS }
-  );
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/signups?select=*&order=event_date.asc,created_at.asc`, { headers: BASE_HEADERS });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
-
 async function insertSignup(row) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/signups`, {
     method: 'POST',
     headers: { ...BASE_HEADERS, 'Prefer': 'return=minimal' },
     body: JSON.stringify(row),
   });
-  if (!res.ok) {
-    const msg = await res.text();
-    throw new Error(msg || `HTTP ${res.status}`);
-  }
+  if (!res.ok) throw new Error(await res.text() || `HTTP ${res.status}`);
 }
 
-// ─────────────────────────────────────────────
-//  Rendering
-// ─────────────────────────────────────────────
 function escHtml(s) {
-  return String(s)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
-
 function fmtTimestamp(iso) {
-  const dt = new Date(iso);
-  return dt.toLocaleString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    hour: 'numeric', minute: '2-digit', hour12: true,
-  });
+  return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit', hour12:true });
 }
-
-const HELPING_LABELS = {
-  setup:    'setup',
-  takedown: 'takedown',
-  both:     'both',
-};
+const HELPING_LABELS = { setup:'setup', takedown:'takedown', both:'both' };
 
 function renderSignups(signups) {
   const container = document.getElementById('signups-table');
-
-  if (!signups.length) {
-    container.innerHTML = '<p class="empty-msg">No entries yet — BE THE FIRST! 👆</p>';
-    return;
-  }
-
-  // group by event_date
+  if (!signups.length) { container.innerHTML = '<p class="empty-msg">NO ENTRIES YET — BE THE FIRST</p>'; return; }
   const byDate = {};
-  for (const s of signups) {
-    if (!byDate[s.event_date]) byDate[s.event_date] = [];
-    byDate[s.event_date].push(s);
-  }
-
+  for (const s of signups) { if (!byDate[s.event_date]) byDate[s.event_date] = []; byDate[s.event_date].push(s); }
   let html = '';
   for (const [date, entries] of Object.entries(byDate)) {
     const someonesBringing = entries.some(e => e.brings_firewood);
     const totalDonations   = entries.reduce((sum, e) => sum + (e.firewood_amount || 0), 0);
     const needed           = Math.max(0, 15 - totalDonations);
     const firewoodHtml     = someonesBringing
-      ? `<span class="funded">🔥 COVERED (firewood being brought)</span>`
+      ? `<span class="funded">🔥 COVERED — firewood being brought</span>`
       : totalDonations >= 15
         ? `<span class="funded">🔥 FUNDED ($${totalDonations} raised)</span>`
-        : `<span class="unfunded">🪵 needs $${needed} more (${totalDonations > 0 ? '$' + totalDonations + ' raised' : 'nothing yet'})</span>`;
-
+        : `<span class="unfunded">🪵 needs $${needed} more${totalDonations > 0 ? ' ($'+totalDonations+' raised)' : ''}</span>`;
     const rows = entries.map(e => `
       <tr>
         <td>${escHtml(e.name)}</td>
         <td>${e.helping === 'other' && e.helping_other ? escHtml(e.helping_other) : escHtml(HELPING_LABELS[e.helping] || e.helping)}</td>
-        <td style="text-align:center">${e.brings_firewood ? '🪵 bringing wood' : e.firewood_amount > 0 ? '✅ $' + e.firewood_amount : '—'}</td>
-        <td style="color:#888; font-size:11px">${fmtTimestamp(e.created_at)}</td>
+        <td>${e.brings_firewood ? '🪵 bringing wood' : e.firewood_amount > 0 ? '✅ $'+e.firewood_amount : '—'}</td>
+        <td style="color:#333; font-size:11px">${fmtTimestamp(e.created_at)}</td>
       </tr>`).join('');
-
-    html += `
-      <div class="date-block">
-        <div class="date-header">
-          <span>📅 ${escHtml(date)}</span>
-          <span>FIREWOOD: ${firewoodHtml}</span>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Helping With</th>
-              <th>Firewood $</th>
-              <th>Signed Up</th>
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>`;
+    html += `<div class="date-block">
+      <div class="date-header"><span>📅 ${escHtml(date)}</span><span>${firewoodHtml}</span></div>
+      <table><thead><tr><th>Name</th><th>Helping</th><th>Firewood</th><th>Signed Up</th></tr></thead>
+      <tbody>${rows}</tbody></table></div>`;
   }
-
   container.innerHTML = html;
 }
 
-// ─────────────────────────────────────────────
-//  Status messages
-// ─────────────────────────────────────────────
 function setStatus(msg, type) {
   const el = document.getElementById('status-msg');
   el.textContent = msg;
   el.className = type === 'ok' ? 'status-ok' : type === 'err' ? 'status-err' : 'status-inf';
 }
 
-// ─────────────────────────────────────────────
-//  Load + auto-refresh
-// ─────────────────────────────────────────────
 async function loadAndRender() {
-  try {
-    const signups = await fetchSignups();
-    renderSignups(signups);
-  } catch (err) {
-    document.getElementById('signups-table').innerHTML =
-      `<p class="empty-msg" style="color:#ff4444">⚠️ Could not load signups: ${escHtml(err.message)}</p>`;
-  }
+  try { renderSignups(await fetchSignups()); }
+  catch(err) { document.getElementById('signups-table').innerHTML = `<p class="empty-msg" style="color:#ff4444">⚠️ ${escHtml(err.message)}</p>`; }
 }
-
 loadAndRender();
-setInterval(loadAndRender, 30_000);
+setInterval(loadAndRender, 30000);
 
-// show/hide "bringing firewood" + "something else" fields based on helping selection
-document.getElementById('helping').addEventListener('change', function () {
+// date dropdown from localStorage
+const DATES_KEY = 'saunacamp_dates';
+const DEFAULT_DATES = ['Sauna Camp 03'];
+function getDates() {
+  try { const s = localStorage.getItem(DATES_KEY); const p = s ? JSON.parse(s) : null; return Array.isArray(p) && p.length ? p : DEFAULT_DATES; }
+  catch { return DEFAULT_DATES; }
+}
+function populateDateDropdown() {
+  const sel = document.getElementById('event_date');
+  const dates = getDates();
+  sel.innerHTML = '<option value="">-- choose one --</option>' +
+    dates.map(d => `<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
+}
+populateDateDropdown();
+
+// helping select → show/hide sub-fields
+document.getElementById('helping').addEventListener('change', function() {
   const firewoodRow = document.getElementById('brings-firewood-row');
   const otherRow    = document.getElementById('helping-other-row');
   const otherInput  = document.getElementById('helping_other');
-
-  firewoodRow.style.display = this.value === 'setup' ? 'block' : 'none';
-  if (this.value !== 'setup') document.getElementById('brings_firewood').checked = false;
-
+  const showFirewood = this.value === 'setup' || this.value === 'both';
+  firewoodRow.style.display = showFirewood ? 'block' : 'none';
+  if (!showFirewood) document.getElementById('brings_firewood').checked = false;
   otherRow.style.display = this.value === 'other' ? 'block' : 'none';
   otherInput.required    = this.value === 'other';
   if (this.value !== 'other') otherInput.value = '';
 });
 
-// ─────────────────────────────────────────────
-//  Toggle firewood amount field
-// ─────────────────────────────────────────────
-document.getElementById('firewood_donation').addEventListener('change', function () {
-  const row = document.getElementById('firewood-amount-row');
+// firewood donation toggle
+document.getElementById('firewood_donation').addEventListener('change', function() {
+  const row   = document.getElementById('firewood-amount-row');
   const input = document.getElementById('firewood_amount');
-  if (this.checked) {
-    row.classList.add('visible');
-    input.required = true;
-    input.value = input.value || '15';
-  } else {
-    row.classList.remove('visible');
-    input.required = false;
-    input.value = '';
-  }
+  if (this.checked) { row.classList.add('visible'); input.required = true; input.value = input.value || '15'; }
+  else { row.classList.remove('visible'); input.required = false; input.value = ''; }
 });
 
-// ─────────────────────────────────────────────
-//  Form submit
-// ─────────────────────────────────────────────
+// form submit
 document.getElementById('signup-form').addEventListener('submit', async (e) => {
   e.preventDefault();
-  const form = e.target;
-
+  const form    = e.target;
   const donating = form.firewood_donation.checked;
   const row = {
     name:            form.name.value.trim(),
@@ -626,74 +620,41 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     brings_firewood: form.brings_firewood.checked,
     helping_other:   form.helping.value === 'other' ? form.helping_other.value.trim() : null,
   };
-
-  setStatus('Submitting...', 'inf');
+  setStatus('submitting...', 'inf');
   form.querySelector('.submit-btn').disabled = true;
-
   try {
     await insertSignup(row);
-    setStatus("✅ YOU'RE IN! See you at the sauna! 🔥", 'ok');
+    setStatus("✅ you're in! see you at the sauna 🔥", 'ok');
     form.reset();
     document.getElementById('firewood-amount-row').classList.remove('visible');
     document.getElementById('brings-firewood-row').style.display = 'none';
+    document.getElementById('helping-other-row').style.display   = 'none';
     await loadAndRender();
-  } catch (err) {
-    setStatus(`❌ Error: ${err.message}`, 'err');
-  } finally {
-    form.querySelector('.submit-btn').disabled = false;
-  }
+  } catch(err) {
+    setStatus(`❌ ${err.message}`, 'err');
+  } finally { form.querySelector('.submit-btn').disabled = false; }
 });
 
-// fake visitor counter for vibes
-
-// ─────────────────────────────────────────────
-//  Event date dropdown — backed by localStorage
-// ─────────────────────────────────────────────
-const DATES_KEY = 'saunacamp_dates';
-const DEFAULT_DATES = ['Sauna Camp 03'];
-
-function getDates() {
-  try {
-    const stored = localStorage.getItem(DATES_KEY);
-    const parsed = stored ? JSON.parse(stored) : null;
-    return Array.isArray(parsed) && parsed.length ? parsed : DEFAULT_DATES;
-  } catch { return DEFAULT_DATES; }
-}
-
-function populateDateDropdown() {
-  const sel = document.getElementById('event_date');
-  const dates = getDates();
-  sel.innerHTML = '<option value="">-- choose one --</option>' +
-    dates.map(d => `<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
-}
-
-populateDateDropdown();
-
-// ─────────────────────────────────────────────
-//  Hidden admin backdoor — click ● five times
-// ─────────────────────────────────────────────
+// hidden admin — 3 clicks on LIVE dot
 let liveTaps = 0, liveTimer;
 document.getElementById('live-dot').addEventListener('click', () => {
   liveTaps++;
   clearTimeout(liveTimer);
   liveTimer = setTimeout(() => { liveTaps = 0; }, 3000);
-  // brief flash to confirm click registered
   const dot = document.getElementById('live-dot');
-  dot.style.color = '#00ff00';
+  dot.style.color = 'var(--green)';
   setTimeout(() => { dot.style.color = ''; }, 150);
   if (liveTaps >= 3) { liveTaps = 0; adminOpen(); }
 });
 
 function adminOpen() {
-  const dates = getDates();
-  document.getElementById('admin-options').innerHTML = dates.map((d, i) => `
+  document.getElementById('admin-options').innerHTML = getDates().map((d, i) => `
     <div class="admin-option-row">
       <input type="text" value="${escHtml(d)}" id="admin-opt-${i}">
       <button onclick="this.parentElement.remove()">DEL</button>
     </div>`).join('');
   document.getElementById('admin-modal').classList.add('open');
 }
-
 function adminAddRow() {
   const container = document.getElementById('admin-options');
   const i = Date.now();
@@ -704,16 +665,14 @@ function adminAddRow() {
   container.appendChild(row);
   row.querySelector('input').focus();
 }
-
 function adminSave() {
   const inputs = document.querySelectorAll('#admin-options .admin-option-row input');
-  const dates = [...inputs].map(i => i.value.trim()).filter(Boolean);
+  const dates  = [...inputs].map(i => i.value.trim()).filter(Boolean);
   if (!dates.length) { alert('Add at least one date.'); return; }
   localStorage.setItem(DATES_KEY, JSON.stringify(dates));
   populateDateDropdown();
   adminClose();
 }
-
 function adminClose() {
   document.getElementById('admin-modal').classList.remove('open');
 }
