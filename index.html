@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>~~* SAUNA CAMP *~~</title>
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -27,10 +28,11 @@
     font-family: 'Press Start 2P', monospace;
     color: #ff6600;
     text-shadow: 4px 4px #ff0000, -1px -1px #ffaa00;
-    font-size: 1.6em;
+    font-size: clamp(0.7em, 5vw, 1.6em);
     text-align: center;
     margin-bottom: 4px;
     line-height: 1.5;
+    white-space: nowrap;
   }
 
   h2 {
@@ -104,6 +106,7 @@
   }
 
   input[type="text"],
+  input[type="number"],
   select {
     background: #000000;
     color: #00ff00;
@@ -117,6 +120,7 @@
   }
 
   input[type="text"]:focus,
+  input[type="number"]:focus,
   select:focus {
     border-color: #00ff00;
     box-shadow: 0 0 6px #00ff00;
@@ -143,6 +147,15 @@
     accent-color: #ff6600;
     cursor: pointer;
     flex-shrink: 0;
+  }
+
+  #firewood-amount-row {
+    display: none;
+    margin-top: 10px;
+  }
+
+  #firewood-amount-row.visible {
+    display: block;
   }
 
   .submit-btn {
@@ -248,11 +261,77 @@
     border: 1px dashed #333;
   }
 
-  .counter {
-    text-align: right;
-    color: #666;
-    font-size: 11px;
-    margin-top: 4px;
+  /* ---- ADMIN MODAL ---- */
+  #admin-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.88);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+  }
+  #admin-modal.open { display: flex; }
+  #admin-box {
+    background: #000040;
+    border: 3px solid #00ff00;
+    box-shadow: 0 0 30px #00ff00;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    font-family: 'Courier New', monospace;
+  }
+  #admin-box h3 {
+    font-family: 'Press Start 2P', monospace;
+    color: #00ff00;
+    font-size: 0.55em;
+    margin: 0 0 16px;
+  }
+  .admin-option-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .admin-option-row input {
+    flex: 1;
+    background: #000;
+    color: #00ff00;
+    border: 1px solid #006600;
+    padding: 5px 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+  }
+  .admin-option-row button {
+    background: #330000;
+    color: #ff4444;
+    border: 1px solid #660000;
+    padding: 4px 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .admin-btn {
+    background: #003300;
+    color: #00ff00;
+    border: 2px solid #00ff00;
+    padding: 7px 14px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-right: 8px;
+  }
+  .admin-btn:hover { background: #005500; }
+  #admin-add-btn {
+    background: none;
+    color: #ffff00;
+    border: 1px dashed #666;
+    padding: 5px 12px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    margin-bottom: 12px;
+    width: 100%;
   }
 
   /* ---- FOOTER ---- */
@@ -288,16 +367,10 @@
 
   <form id="signup-form" autocomplete="off">
     <label for="name">YOUR NAME:</label>
-    <input type="text" id="name" name="name" required placeholder="e.g. Hot Steve" maxlength="80">
+    <input type="text" id="name" name="name" required placeholder="e.g. Mr. Ant" maxlength="80">
 
     <label for="event_date">WHICH DATE ARE YOU COMING:</label>
-    <select id="event_date" name="event_date" required>
-      <option value="">-- pick a date --</option>
-      <option value="2026-05-10">Sunday, May 10 2026</option>
-      <option value="2026-05-17">Sunday, May 17 2026</option>
-      <option value="2026-05-24">Sunday, May 24 2026</option>
-      <option value="2026-05-31">Sunday, May 31 2026</option>
-    </select>
+    <select id="event_date" name="event_date" required></select>
 
     <label for="helping">I CAN HELP WITH:</label>
     <select id="helping" name="helping" required>
@@ -305,13 +378,18 @@
       <option value="setup">Setup</option>
       <option value="takedown">Takedown</option>
       <option value="both">Both</option>
-      <option value="neither">Just showing up (that's ok too)</option>
     </select>
 
     <label class="checkbox-row">
       <input type="checkbox" id="firewood_donation" name="firewood_donation">
-      YES, I'LL DONATE $15 FOR FIREWOOD 🪵
+      YES, I'LL DONATE TOWARD FIREWOOD 🪵
     </label>
+
+    <div id="firewood-amount-row">
+      <label for="firewood_amount">DONATION AMOUNT ($):</label>
+      <input type="number" id="firewood_amount" name="firewood_amount" min="1" placeholder="15">
+      <div style="color:#ff6600; font-size:11px; margin-top:5px;">venmo @JackWallis</div>
+    </div>
 
     <button type="submit" class="submit-btn">*** SIGN ME UP ***</button>
   </form>
@@ -320,7 +398,7 @@
 
   <hr>
 
-  <h2>[ WHO'S COMING ]</h2>
+  <h2>[ SUPPORT LOG ]</h2>
 
   <div id="signups-table">
     <p class="empty-msg"><span class="blink">▌</span> Loading...</p>
@@ -329,7 +407,19 @@
   <div class="footer">
     Best viewed in Netscape Navigator 4.0 at 800x600 &nbsp;·&nbsp;
     You are visitor #<span id="visitor-count">???</span>
-    &nbsp;·&nbsp; <span class="blink">●</span> LIVE
+    &nbsp;·&nbsp; <span class="blink" id="live-dot" style="cursor:default">●</span> LIVE
+  </div>
+
+  <!-- admin modal -->
+  <div id="admin-modal">
+    <div id="admin-box">
+      <h3>[ ADMIN ] EVENT DATES</h3>
+      <div id="admin-options"></div>
+      <button id="admin-add-btn" onclick="adminAddRow()">+ ADD DATE</button>
+      <br>
+      <button class="admin-btn" onclick="adminSave()">SAVE</button>
+      <button class="admin-btn" onclick="adminClose()">CANCEL</button>
+    </div>
   </div>
 
 </div>
@@ -337,10 +427,9 @@
 <script>
 // ─────────────────────────────────────────────
 //  CONFIG — replace these with your actual values
-//  (or set them server-side before serving this file)
 // ─────────────────────────────────────────────
-const SUPABASE_URL      = 'YOUR_SUPABASE_URL';       // e.g. https://xxxx.supabase.co
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';  // public anon key
+const SUPABASE_URL      = 'https://ixdsojtdqwcrlgstsbcg.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_GtZd5Nu8XrcBIfgYp35s3w_6aUC3LK2';
 
 // ─────────────────────────────────────────────
 //  Supabase REST helpers
@@ -383,12 +472,11 @@ function escHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-function fmtDate(dateStr) {
-  // dateStr is YYYY-MM-DD
-  const [y, m, d] = dateStr.split('-').map(Number);
-  const dt = new Date(y, m - 1, d);
-  return dt.toLocaleDateString('en-US', {
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+function fmtTimestamp(iso) {
+  const dt = new Date(iso);
+  return dt.toLocaleString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit', hour12: true,
   });
 }
 
@@ -396,18 +484,17 @@ const HELPING_LABELS = {
   setup:    'Setup',
   takedown: 'Takedown',
   both:     'Setup + Takedown',
-  neither:  'Just attending',
 };
 
 function renderSignups(signups) {
   const container = document.getElementById('signups-table');
 
   if (!signups.length) {
-    container.innerHTML = '<p class="empty-msg">No signups yet — BE THE FIRST! 👆</p>';
+    container.innerHTML = '<p class="empty-msg">No entries yet — BE THE FIRST! 👆</p>';
     return;
   }
 
-  // group by date
+  // group by event_date
   const byDate = {};
   for (const s of signups) {
     if (!byDate[s.event_date]) byDate[s.event_date] = [];
@@ -416,8 +503,7 @@ function renderSignups(signups) {
 
   let html = '';
   for (const [date, entries] of Object.entries(byDate)) {
-    const donationCount  = entries.filter(e => e.firewood_donation).length;
-    const totalDonations = donationCount * 15;
+    const totalDonations = entries.reduce((sum, e) => sum + (e.firewood_amount || 0), 0);
     const needed         = Math.max(0, 15 - totalDonations);
     const firewoodHtml   = totalDonations >= 15
       ? `<span class="funded">🔥 FUNDED ($${totalDonations} raised)</span>`
@@ -427,13 +513,14 @@ function renderSignups(signups) {
       <tr>
         <td>${escHtml(e.name)}</td>
         <td>${escHtml(HELPING_LABELS[e.helping] || e.helping)}</td>
-        <td style="text-align:center">${e.firewood_donation ? '✅ $15' : '—'}</td>
+        <td style="text-align:center">${e.firewood_amount > 0 ? '✅ $' + e.firewood_amount : '—'}</td>
+        <td style="color:#888; font-size:11px">${fmtTimestamp(e.created_at)}</td>
       </tr>`).join('');
 
     html += `
       <div class="date-block">
         <div class="date-header">
-          <span>📅 ${fmtDate(date)}</span>
+          <span>📅 ${escHtml(date)}</span>
           <span>FIREWOOD: ${firewoodHtml}</span>
         </div>
         <table>
@@ -442,11 +529,11 @@ function renderSignups(signups) {
               <th>Name</th>
               <th>Helping With</th>
               <th>Firewood $</th>
+              <th>Signed Up</th>
             </tr>
           </thead>
           <tbody>${rows}</tbody>
         </table>
-        <div class="counter">${entries.length} attendee${entries.length !== 1 ? 's' : ''}</div>
       </div>`;
   }
 
@@ -476,7 +563,24 @@ async function loadAndRender() {
 }
 
 loadAndRender();
-setInterval(loadAndRender, 30_000); // refresh every 30s
+setInterval(loadAndRender, 30_000);
+
+// ─────────────────────────────────────────────
+//  Toggle firewood amount field
+// ─────────────────────────────────────────────
+document.getElementById('firewood_donation').addEventListener('change', function () {
+  const row = document.getElementById('firewood-amount-row');
+  const input = document.getElementById('firewood_amount');
+  if (this.checked) {
+    row.classList.add('visible');
+    input.required = true;
+    input.value = input.value || '15';
+  } else {
+    row.classList.remove('visible');
+    input.required = false;
+    input.value = '';
+  }
+});
 
 // ─────────────────────────────────────────────
 //  Form submit
@@ -485,11 +589,12 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const form = e.target;
 
+  const donating = form.firewood_donation.checked;
   const row = {
-    name:              form.name.value.trim(),
-    event_date:        form.event_date.value,
-    helping:           form.helping.value,
-    firewood_donation: form.firewood_donation.checked,
+    name:            form.name.value.trim(),
+    event_date:      form.event_date.value.trim(),
+    helping:         form.helping.value,
+    firewood_amount: donating ? parseInt(form.firewood_amount.value, 10) || 0 : 0,
   };
 
   setStatus('Submitting...', 'inf');
@@ -499,6 +604,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     await insertSignup(row);
     setStatus("✅ YOU'RE IN! See you at the sauna! 🔥", 'ok');
     form.reset();
+    document.getElementById('firewood-amount-row').classList.remove('visible');
     await loadAndRender();
   } catch (err) {
     setStatus(`❌ Error: ${err.message}`, 'err');
@@ -510,6 +616,74 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
 // fake visitor counter for vibes
 document.getElementById('visitor-count').textContent =
   (Math.floor(Math.random() * 8000) + 1337).toLocaleString();
+
+// ─────────────────────────────────────────────
+//  Event date dropdown — backed by localStorage
+// ─────────────────────────────────────────────
+const DATES_KEY = 'saunacamp_dates';
+const DEFAULT_DATES = ['Sauna Camp 03'];
+
+function getDates() {
+  try {
+    const stored = localStorage.getItem(DATES_KEY);
+    const parsed = stored ? JSON.parse(stored) : null;
+    return Array.isArray(parsed) && parsed.length ? parsed : DEFAULT_DATES;
+  } catch { return DEFAULT_DATES; }
+}
+
+function populateDateDropdown() {
+  const sel = document.getElementById('event_date');
+  const dates = getDates();
+  sel.innerHTML = '<option value="">-- choose one --</option>' +
+    dates.map(d => `<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
+}
+
+populateDateDropdown();
+
+// ─────────────────────────────────────────────
+//  Hidden admin backdoor — click ● five times
+// ─────────────────────────────────────────────
+let liveTaps = 0, liveTimer;
+document.getElementById('live-dot').addEventListener('click', () => {
+  liveTaps++;
+  clearTimeout(liveTimer);
+  liveTimer = setTimeout(() => { liveTaps = 0; }, 2000);
+  if (liveTaps >= 5) { liveTaps = 0; adminOpen(); }
+});
+
+function adminOpen() {
+  const dates = getDates();
+  document.getElementById('admin-options').innerHTML = dates.map((d, i) => `
+    <div class="admin-option-row">
+      <input type="text" value="${escHtml(d)}" id="admin-opt-${i}">
+      <button onclick="this.parentElement.remove()">DEL</button>
+    </div>`).join('');
+  document.getElementById('admin-modal').classList.add('open');
+}
+
+function adminAddRow() {
+  const container = document.getElementById('admin-options');
+  const i = Date.now();
+  const row = document.createElement('div');
+  row.className = 'admin-option-row';
+  row.innerHTML = `<input type="text" id="admin-opt-${i}" placeholder="e.g. Sauna Camp 04">
+    <button onclick="this.parentElement.remove()">DEL</button>`;
+  container.appendChild(row);
+  row.querySelector('input').focus();
+}
+
+function adminSave() {
+  const inputs = document.querySelectorAll('#admin-options .admin-option-row input');
+  const dates = [...inputs].map(i => i.value.trim()).filter(Boolean);
+  if (!dates.length) { alert('Add at least one date.'); return; }
+  localStorage.setItem(DATES_KEY, JSON.stringify(dates));
+  populateDateDropdown();
+  adminClose();
+}
+
+function adminClose() {
+  document.getElementById('admin-modal').classList.remove('open');
+}
 </script>
 </body>
 </html>
