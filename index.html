@@ -379,7 +379,12 @@
       <option value="setup">setup</option>
       <option value="takedown">takedown</option>
       <option value="both">both</option>
+      <option value="other">something else</option>
     </select>
+
+    <div id="helping-other-row" style="display:none; margin-top:8px;">
+      <input type="text" id="helping_other" placeholder="what can you help with?" maxlength="120">
+    </div>
 
     <div id="brings-firewood-row" style="display:none; margin-top:14px;">
       <label class="checkbox-row">
@@ -413,9 +418,7 @@
   </div>
 
   <div class="footer">
-    Best viewed in Netscape Navigator 4.0 at 800x600 &nbsp;·&nbsp;
-    You are visitor #<span id="visitor-count">???</span>
-    &nbsp;·&nbsp; <span class="blink" id="live-dot" style="cursor:default">●</span> LIVE
+    <span class="blink" id="live-dot" style="cursor:default; padding: 8px; user-select:none; -webkit-user-select:none;">●</span> LIVE
   </div>
 
   <!-- admin modal -->
@@ -523,7 +526,7 @@ function renderSignups(signups) {
     const rows = entries.map(e => `
       <tr>
         <td>${escHtml(e.name)}</td>
-        <td>${escHtml(HELPING_LABELS[e.helping] || e.helping)}</td>
+        <td>${e.helping === 'other' && e.helping_other ? escHtml(e.helping_other) : escHtml(HELPING_LABELS[e.helping] || e.helping)}</td>
         <td style="text-align:center">${e.brings_firewood ? '🪵 bringing wood' : e.firewood_amount > 0 ? '✅ $' + e.firewood_amount : '—'}</td>
         <td style="color:#888; font-size:11px">${fmtTimestamp(e.created_at)}</td>
       </tr>`).join('');
@@ -576,15 +579,18 @@ async function loadAndRender() {
 loadAndRender();
 setInterval(loadAndRender, 30_000);
 
-// show/hide "bringing firewood" checkbox when setup is selected
+// show/hide "bringing firewood" + "something else" fields based on helping selection
 document.getElementById('helping').addEventListener('change', function () {
-  const row = document.getElementById('brings-firewood-row');
-  if (this.value === 'setup') {
-    row.style.display = 'block';
-  } else {
-    row.style.display = 'none';
-    document.getElementById('brings_firewood').checked = false;
-  }
+  const firewoodRow = document.getElementById('brings-firewood-row');
+  const otherRow    = document.getElementById('helping-other-row');
+  const otherInput  = document.getElementById('helping_other');
+
+  firewoodRow.style.display = this.value === 'setup' ? 'block' : 'none';
+  if (this.value !== 'setup') document.getElementById('brings_firewood').checked = false;
+
+  otherRow.style.display = this.value === 'other' ? 'block' : 'none';
+  otherInput.required    = this.value === 'other';
+  if (this.value !== 'other') otherInput.value = '';
 });
 
 // ─────────────────────────────────────────────
@@ -618,6 +624,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     helping:         form.helping.value,
     firewood_amount: donating ? parseInt(form.firewood_amount.value, 10) || 0 : 0,
     brings_firewood: form.brings_firewood.checked,
+    helping_other:   form.helping.value === 'other' ? form.helping_other.value.trim() : null,
   };
 
   setStatus('Submitting...', 'inf');
@@ -638,8 +645,6 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
 });
 
 // fake visitor counter for vibes
-document.getElementById('visitor-count').textContent =
-  (Math.floor(Math.random() * 8000) + 1337).toLocaleString();
 
 // ─────────────────────────────────────────────
 //  Event date dropdown — backed by localStorage
@@ -671,8 +676,12 @@ let liveTaps = 0, liveTimer;
 document.getElementById('live-dot').addEventListener('click', () => {
   liveTaps++;
   clearTimeout(liveTimer);
-  liveTimer = setTimeout(() => { liveTaps = 0; }, 2000);
-  if (liveTaps >= 5) { liveTaps = 0; adminOpen(); }
+  liveTimer = setTimeout(() => { liveTaps = 0; }, 3000);
+  // brief flash to confirm click registered
+  const dot = document.getElementById('live-dot');
+  dot.style.color = '#00ff00';
+  setTimeout(() => { dot.style.color = ''; }, 150);
+  if (liveTaps >= 3) { liveTaps = 0; adminOpen(); }
 });
 
 function adminOpen() {
