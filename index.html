@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>~~* SAUNA CAMP *~~</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔥</text></svg>">
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -369,18 +370,25 @@
     <label for="name">YOUR NAME:</label>
     <input type="text" id="name" name="name" required placeholder="e.g. Mr. Ant" maxlength="80">
 
-    <label for="event_date">WHICH DATE ARE YOU COMING:</label>
+    <label for="event_date">WHICH CAMP ARE YOU COMING TO:</label>
     <select id="event_date" name="event_date" required></select>
 
     <label for="helping">I CAN HELP WITH:</label>
     <select id="helping" name="helping" required>
       <option value="">-- choose one --</option>
-      <option value="setup">Setup</option>
-      <option value="takedown">Takedown</option>
-      <option value="both">Both</option>
+      <option value="setup">setup</option>
+      <option value="takedown">takedown</option>
+      <option value="both">both</option>
     </select>
 
-    <label class="checkbox-row">
+    <div id="brings-firewood-row" style="display:none; margin-top:14px;">
+      <label class="checkbox-row">
+        <input type="checkbox" id="brings_firewood" name="brings_firewood">
+        YES, I'LL BRING FIREWOOD 🪵
+      </label>
+    </div>
+
+    <label class="checkbox-row" style="margin-top:14px;">
       <input type="checkbox" id="firewood_donation" name="firewood_donation">
       YES, I'LL DONATE TOWARD FIREWOOD 🪵
     </label>
@@ -481,9 +489,9 @@ function fmtTimestamp(iso) {
 }
 
 const HELPING_LABELS = {
-  setup:    'Setup',
-  takedown: 'Takedown',
-  both:     'Setup + Takedown',
+  setup:    'setup',
+  takedown: 'takedown',
+  both:     'both',
 };
 
 function renderSignups(signups) {
@@ -503,17 +511,20 @@ function renderSignups(signups) {
 
   let html = '';
   for (const [date, entries] of Object.entries(byDate)) {
-    const totalDonations = entries.reduce((sum, e) => sum + (e.firewood_amount || 0), 0);
-    const needed         = Math.max(0, 15 - totalDonations);
-    const firewoodHtml   = totalDonations >= 15
-      ? `<span class="funded">🔥 FUNDED ($${totalDonations} raised)</span>`
-      : `<span class="unfunded">🪵 needs $${needed} more (${totalDonations > 0 ? '$' + totalDonations + ' raised' : 'nothing yet'})</span>`;
+    const someonesBringing = entries.some(e => e.brings_firewood);
+    const totalDonations   = entries.reduce((sum, e) => sum + (e.firewood_amount || 0), 0);
+    const needed           = Math.max(0, 15 - totalDonations);
+    const firewoodHtml     = someonesBringing
+      ? `<span class="funded">🔥 COVERED (firewood being brought)</span>`
+      : totalDonations >= 15
+        ? `<span class="funded">🔥 FUNDED ($${totalDonations} raised)</span>`
+        : `<span class="unfunded">🪵 needs $${needed} more (${totalDonations > 0 ? '$' + totalDonations + ' raised' : 'nothing yet'})</span>`;
 
     const rows = entries.map(e => `
       <tr>
         <td>${escHtml(e.name)}</td>
         <td>${escHtml(HELPING_LABELS[e.helping] || e.helping)}</td>
-        <td style="text-align:center">${e.firewood_amount > 0 ? '✅ $' + e.firewood_amount : '—'}</td>
+        <td style="text-align:center">${e.brings_firewood ? '🪵 bringing wood' : e.firewood_amount > 0 ? '✅ $' + e.firewood_amount : '—'}</td>
         <td style="color:#888; font-size:11px">${fmtTimestamp(e.created_at)}</td>
       </tr>`).join('');
 
@@ -565,6 +576,17 @@ async function loadAndRender() {
 loadAndRender();
 setInterval(loadAndRender, 30_000);
 
+// show/hide "bringing firewood" checkbox when setup is selected
+document.getElementById('helping').addEventListener('change', function () {
+  const row = document.getElementById('brings-firewood-row');
+  if (this.value === 'setup') {
+    row.style.display = 'block';
+  } else {
+    row.style.display = 'none';
+    document.getElementById('brings_firewood').checked = false;
+  }
+});
+
 // ─────────────────────────────────────────────
 //  Toggle firewood amount field
 // ─────────────────────────────────────────────
@@ -595,6 +617,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     event_date:      form.event_date.value.trim(),
     helping:         form.helping.value,
     firewood_amount: donating ? parseInt(form.firewood_amount.value, 10) || 0 : 0,
+    brings_firewood: form.brings_firewood.checked,
   };
 
   setStatus('Submitting...', 'inf');
@@ -605,6 +628,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     setStatus("✅ YOU'RE IN! See you at the sauna! 🔥", 'ok');
     form.reset();
     document.getElementById('firewood-amount-row').classList.remove('visible');
+    document.getElementById('brings-firewood-row').style.display = 'none';
     await loadAndRender();
   } catch (err) {
     setStatus(`❌ Error: ${err.message}`, 'err');
