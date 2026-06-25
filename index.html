@@ -573,7 +573,7 @@ setInterval(loadAndRender, 30000);
 
 // date dropdown from localStorage
 const DATES_KEY = 'saunacamp_dates';
-const DEFAULT_DATES = ['Sauna Camp 03','sauna camp 04'];
+const DEFAULT_DATES = ['sauna camp 05'];
 function getDates() {
   try { const s = localStorage.getItem(DATES_KEY); const p = s ? JSON.parse(s) : null; return Array.isArray(p) && p.length ? p : DEFAULT_DATES; }
   catch { return DEFAULT_DATES; }
