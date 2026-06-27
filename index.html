@@ -573,10 +573,20 @@ setInterval(loadAndRender, 30000);
 
 // date dropdown from localStorage
 const DATES_KEY = 'saunacamp_dates';
-const DEFAULT_DATES = ['sauna camp 05'];
+const DATES_VERSION = 2; // bump this to force everyone to get new DEFAULT_DATES
+const DEFAULT_DATES = ['Sauna Camp 05'];
 function getDates() {
-  try { const s = localStorage.getItem(DATES_KEY); const p = s ? JSON.parse(s) : null; return Array.isArray(p) && p.length ? p : DEFAULT_DATES; }
-  catch { return DEFAULT_DATES; }
+  try {
+    const v = parseInt(localStorage.getItem('saunacamp_dates_v') || '0', 10);
+    if (v < DATES_VERSION) {
+      localStorage.removeItem(DATES_KEY);
+      localStorage.setItem('saunacamp_dates_v', DATES_VERSION);
+      return DEFAULT_DATES;
+    }
+    const s = localStorage.getItem(DATES_KEY);
+    const p = s ? JSON.parse(s) : null;
+    return Array.isArray(p) && p.length ? p : DEFAULT_DATES;
+  } catch { return DEFAULT_DATES; }
 }
 function populateDateDropdown() {
   const sel = document.getElementById('event_date');
