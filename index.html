@@ -325,78 +325,6 @@ tr:hover td:last-child { color: var(--green-dim); }
   padding-top: 14px;
 }
 
-/* ── ADMIN MODAL ── */
-#admin-modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.92);
-  z-index: 9999;
-  align-items: center;
-  justify-content: center;
-}
-#admin-modal.open { display: flex; }
-#admin-box {
-  background: #000;
-  border: 2px solid var(--green);
-  box-shadow: 0 0 40px rgba(57,255,20,0.2);
-  padding: 24px;
-  width: 90%;
-  max-width: 400px;
-}
-#admin-box h3 {
-  font-family: 'Press Start 2P', monospace;
-  color: var(--green);
-  font-size: 0.5em;
-  margin: 0 0 16px;
-  letter-spacing: 2px;
-}
-.admin-option-row {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-.admin-option-row input {
-  flex: 1;
-  background: #000;
-  color: var(--green);
-  border: 1px solid var(--green-dim);
-  padding: 5px 8px;
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-}
-.admin-option-row button {
-  background: #000;
-  color: #ff4444;
-  border: 1px solid #440000;
-  padding: 4px 10px;
-  cursor: pointer;
-  font-family: 'Courier New', monospace;
-}
-.admin-btn {
-  background: #000;
-  color: var(--green);
-  border: 1px solid var(--green-dim);
-  padding: 7px 14px;
-  font-family: 'Courier New', monospace;
-  font-size: 13px;
-  cursor: pointer;
-  margin-top: 10px;
-  margin-right: 8px;
-}
-.admin-btn:hover { border-color: var(--green); }
-#admin-add-btn {
-  background: none;
-  color: #444;
-  border: 1px dashed #333;
-  padding: 5px 12px;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  cursor: pointer;
-  margin-bottom: 12px;
-  width: 100%;
-}
-
 .blink {
   animation: blink 1s step-end infinite;
 }
@@ -484,17 +412,6 @@ tr:hover td:last-child { color: var(--green-dim); }
     <span class="blink" id="live-dot" style="cursor:default; padding:8px; user-select:none; -webkit-user-select:none;">●</span> LIVE
   </div>
 
-  <!-- admin modal -->
-  <div id="admin-modal">
-    <div id="admin-box">
-      <h3>[ ADMIN ]</h3>
-      <div id="admin-options"></div>
-      <button id="admin-add-btn" onclick="adminAddRow()">+ ADD DATE</button><br>
-      <button class="admin-btn" onclick="adminSave()">SAVE</button>
-      <button class="admin-btn" onclick="adminClose()">CANCEL</button>
-    </div>
-  </div>
-
 </div>
 
 <script>
@@ -571,28 +488,12 @@ async function loadAndRender() {
 loadAndRender();
 setInterval(loadAndRender, 30000);
 
-// date dropdown from localStorage
-const DATES_KEY = 'saunacamp_dates';
-const DATES_VERSION = 4; // bump this to force everyone to get new DEFAULT_DATES
-const DEFAULT_DATES = ['sauna camp 07'];
-function getDates() {
-  try {
-    const v = parseInt(localStorage.getItem('saunacamp_dates_v') || '0', 10);
-    if (v < DATES_VERSION) {
-      localStorage.removeItem(DATES_KEY);
-      localStorage.setItem('saunacamp_dates_v', DATES_VERSION);
-      return DEFAULT_DATES;
-    }
-    const s = localStorage.getItem(DATES_KEY);
-    const p = s ? JSON.parse(s) : null;
-    return Array.isArray(p) && p.length ? p : DEFAULT_DATES;
-  } catch { return DEFAULT_DATES; }
-}
+// active signup dates
+const EVENT_DATES = ['sauna camp 08'];
 function populateDateDropdown() {
   const sel = document.getElementById('event_date');
-  const dates = getDates();
   sel.innerHTML = '<option value="">-- choose one --</option>' +
-    dates.map(d => `<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
+    EVENT_DATES.map(d => `<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
 }
 populateDateDropdown();
 
@@ -645,47 +546,6 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
   } finally { form.querySelector('.submit-btn').disabled = false; }
 });
 
-// hidden admin — 3 clicks on LIVE dot
-let liveTaps = 0, liveTimer;
-document.getElementById('live-dot').addEventListener('click', () => {
-  liveTaps++;
-  clearTimeout(liveTimer);
-  liveTimer = setTimeout(() => { liveTaps = 0; }, 3000);
-  const dot = document.getElementById('live-dot');
-  dot.style.color = 'var(--green)';
-  setTimeout(() => { dot.style.color = ''; }, 150);
-  if (liveTaps >= 3) { liveTaps = 0; adminOpen(); }
-});
-
-function adminOpen() {
-  document.getElementById('admin-options').innerHTML = getDates().map((d, i) => `
-    <div class="admin-option-row">
-      <input type="text" value="${escHtml(d)}" id="admin-opt-${i}">
-      <button onclick="this.parentElement.remove()">DEL</button>
-    </div>`).join('');
-  document.getElementById('admin-modal').classList.add('open');
-}
-function adminAddRow() {
-  const container = document.getElementById('admin-options');
-  const i = Date.now();
-  const row = document.createElement('div');
-  row.className = 'admin-option-row';
-  row.innerHTML = `<input type="text" id="admin-opt-${i}" placeholder="e.g. Sauna Camp 04">
-    <button onclick="this.parentElement.remove()">DEL</button>`;
-  container.appendChild(row);
-  row.querySelector('input').focus();
-}
-function adminSave() {
-  const inputs = document.querySelectorAll('#admin-options .admin-option-row input');
-  const dates  = [...inputs].map(i => i.value.trim()).filter(Boolean);
-  if (!dates.length) { alert('Add at least one date.'); return; }
-  localStorage.setItem(DATES_KEY, JSON.stringify(dates));
-  populateDateDropdown();
-  adminClose();
-}
-function adminClose() {
-  document.getElementById('admin-modal').classList.remove('open');
-}
 </script>
 </body>
 </html>
