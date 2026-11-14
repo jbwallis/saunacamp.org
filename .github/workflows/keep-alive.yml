@@ -2,7 +2,12 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: '0 12 */2 * *'  # every 2 days at noon UTC
+    # Daily. Supabase does not publish a threshold — their FAQ says a project
+    # pauses on "too little database activity over a week" and that "a few
+    # requests a day is usually enough", so this is a volume target, not a
+    # recency one. The odd minute is for GitHub's sake, not Supabase's:
+    # scheduled runs clustered at :00 get delayed or dropped.
+    - cron: '37 4 * * *'
   workflow_dispatch:          # allow manual trigger from GitHub UI
 
 jobs:
