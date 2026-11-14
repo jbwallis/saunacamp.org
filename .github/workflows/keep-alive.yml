@@ -2,18 +2,54 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    - cron: '0 12 */3 * *'  # every 3 days at noon UTC
+    - cron: '0 12 */2 * *'  # every 2 days at noon UTC
   workflow_dispatch:          # allow manual trigger from GitHub UI
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase
+      - name: Write to keepalive table
+        env:
+          SUPABASE_URL: https://ixdsojtdqwcrlgstsbcg.supabase.co
+          SUPABASE_KEY: sb_publishable_GtZd5Nu8XrcBIfgYp35s3w_6aUC3LK2
         run: |
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
-            "https://ixdsojtdqwcrlgstsbcg.supabase.co/rest/v1/signups?select=id&limit=1" \
-            -H "apikey: sb_publishable_GtZd5Nu8XrcBIfgYp35s3w_6aUC3LK2" \
-            -H "Authorization: Bearer sb_publishable_GtZd5Nu8XrcBIfgYp35s3w_6aUC3LK2")
-          echo "Supabase responded with HTTP $STATUS"
-          [ "$STATUS" = "200" ] && echo "OK" || echo "WARNING: unexpected status"
+          set -uo pipefail
+
+          # A WRITE, not a read. Read-only pings do not reset Supabase's
+          # free-tier inactivity timer — the project paused three times
+          # while select queries were returning HTTP 200 every 3 days.
+          BODY=$(mktemp)
+          CURL_EXIT=0
+          STATUS=$(curl -sS \
+            --retry 3 --retry-all-errors --retry-delay 15 --max-time 30 \
+            -o "$BODY" -w '%{http_code}' \
+            -X PATCH "$SUPABASE_URL/rest/v1/keepalive?id=eq.1" \
+            -H "apikey: $SUPABASE_KEY" \
+            -H "Authorization: Bearer $SUPABASE_KEY" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=representation" \
+            -d "{\"last_ping\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}") || CURL_EXIT=$?
+
+          if [ "$CURL_EXIT" -ne 0 ]; then
+            echo "::error::curl failed (exit $CURL_EXIT). Exit 6 = could not resolve host, the usual signature of a paused project."
+            exit 1
+          fi
+
+          echo "HTTP $STATUS"
+          cat "$BODY"; echo
+
+          if [ "$STATUS" != "200" ]; then
+            echo "::error::keepalive write failed with HTTP $STATUS. 404 = table missing; 401/403 = key rotated or RLS changed; 5xx = project paused or down."
+            exit 1
+          fi
+
+          # A PATCH that matches no rows still returns 200 with an empty
+          # array. That is a silent no-op — exactly the failure class this
+          # rewrite exists to catch — so require a row back.
+          if [ "$(tr -d '[:space:]' < "$BODY")" = "[]" ]; then
+            echo "::error::keepalive write matched 0 rows — the id=1 seed row is missing, so nothing was written."
+            exit 1
+          fi
+
+          echo "OK — keepalive row updated"
