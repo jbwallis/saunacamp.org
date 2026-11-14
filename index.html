@@ -220,6 +220,7 @@ input[type="checkbox"] {
 #firewood-amount-row.visible { display: block; }
 #brings-firewood-row { display: none; margin-top: 14px; }
 #helping-other-row   { display: none; margin-top: 8px; }
+#attending-row       { display: none; margin-top: 14px; }
 
 /* ── SUBMIT BUTTON — holo on hover ── */
 .submit-wrap {
@@ -362,17 +363,29 @@ tr:hover td:last-child { color: var(--green-dim); }
         <label for="event_date">WHICH CAMP ARE YOU COMING TO</label>
         <select id="event_date" name="event_date" required></select>
 
-        <label for="helping">I CAN HELP WITH</label>
-        <select id="helping" name="helping" required>
-          <option value="">-- choose one --</option>
-          <option value="setup">setup</option>
-          <option value="takedown">takedown</option>
-          <option value="both">both</option>
-          <option value="other">something else</option>
-        </select>
+        <div id="helping-row">
+          <label for="helping">I CAN HELP WITH</label>
+          <select id="helping" name="helping" required>
+            <option value="">-- choose one --</option>
+            <option value="setup">setup</option>
+            <option value="takedown">takedown</option>
+            <option value="both">both</option>
+            <option value="other">something else</option>
+          </select>
+        </div>
 
         <div id="helping-other-row">
           <input type="text" id="helping_other" placeholder="what can you help with?" maxlength="120">
+        </div>
+
+        <div id="attending-row">
+          <label for="attending">CAN YOU MAKE IT? WE'RE SERVING FOOD 🍽️</label>
+          <select id="attending">
+            <option value="">-- choose one --</option>
+            <option value="yes">yes, i'll be there</option>
+            <option value="maybe">maybe</option>
+            <option value="no">can't make it</option>
+          </select>
         </div>
 
         <div id="brings-firewood-row">
@@ -382,7 +395,7 @@ tr:hover td:last-child { color: var(--green-dim); }
           </label>
         </div>
 
-        <label class="checkbox-row" style="margin-top:16px;">
+        <label class="checkbox-row" id="firewood-donation-row" style="margin-top:16px;">
           <input type="checkbox" id="firewood_donation">
           YES, I'LL DONATE TOWARD FIREWOOD 🪵
         </label>
@@ -460,16 +473,31 @@ function renderSignups(signups) {
       : totalDonations >= 15
         ? `<span class="funded">🔥 FUNDED ($${totalDonations} raised)</span>`
         : `<span class="unfunded">🪵 needs $${needed} more${totalDonations > 0 ? ' ($'+totalDonations+' raised)' : ''}</span>`;
+    // RSVP camps swap the firewood column for attendance, and the funding
+    // bar for a headcount. Every other camp renders exactly as before.
+    const rsvp = isRsvp(date);
+    const headerRight = rsvp
+      ? (() => {
+          const n = v => entries.filter(e => e.attending === v).length;
+          const parts = [`🍽️ ${n('yes')} coming`];
+          if (n('maybe')) parts.push(`${n('maybe')} maybe`);
+          if (n('no'))    parts.push(`${n('no')} can't`);
+          return `<span class="funded">${parts.join(' · ')}</span>`;
+        })()
+      : firewoodHtml;
+
     const rows = entries.map(e => `
       <tr>
         <td>${escHtml(e.name)}</td>
-        <td>${e.helping === 'other' && e.helping_other ? escHtml(e.helping_other) : escHtml(HELPING_LABELS[e.helping] || e.helping)}</td>
-        <td>${e.brings_firewood ? '🪵 bringing wood' : e.firewood_amount > 0 ? '✅ $'+e.firewood_amount : '—'}</td>
+        ${rsvp ? '' : `<td>${e.helping === 'other' && e.helping_other ? escHtml(e.helping_other) : escHtml(HELPING_LABELS[e.helping] || e.helping)}</td>`}
+        <td>${rsvp
+              ? escHtml(ATTENDING_LABELS[e.attending] || '—')
+              : (e.brings_firewood ? '🪵 bringing wood' : e.firewood_amount > 0 ? '✅ $'+e.firewood_amount : '—')}</td>
         <td style="color:#333; font-size:11px">${fmtTimestamp(e.created_at)}</td>
       </tr>`).join('');
     html += `<div class="date-block">
-      <div class="date-header"><span>📅 ${escHtml(date)}</span><span>${firewoodHtml}</span></div>
-      <table><thead><tr><th>Name</th><th>Helping</th><th>Firewood</th><th>Signed Up</th></tr></thead>
+      <div class="date-header"><span>📅 ${escHtml(date)}</span><span>${headerRight}</span></div>
+      <table><thead><tr><th>Name</th>${rsvp ? '' : '<th>Helping</th>'}<th>${rsvp ? 'Attending' : 'Firewood'}</th><th>Signed Up</th></tr></thead>
       <tbody>${rows}</tbody></table></div>`;
   }
   container.innerHTML = html;
@@ -489,20 +517,66 @@ loadAndRender();
 setInterval(loadAndRender, 30000);
 
 // active signup dates
-const EVENT_DATES = ['sauna camp 09'];
+const EVENT_DATES = ['sauna camp 10'];
+
+// Camps that use the RSVP form (attendance) instead of the firewood form.
+// To return to the standard setup, simply DON'T add the next camp here —
+// camp 11 and onward get the normal firewood form automatically.
+// Leave past RSVP camps in this list permanently: it is what keeps their
+// support-log block rendering attendance. Removing 'sauna camp 10' later
+// would make its historical rows render as an empty firewood column.
+const RSVP_CAMPS = ['sauna camp 10'];
+const isRsvp = d => RSVP_CAMPS.includes(d);
+
+const ATTENDING_LABELS = { yes:"✅ coming", maybe:"🤔 maybe", no:"❌ can't make it" };
+
+// Swap the form between firewood mode and RSVP mode for the chosen camp.
+function applyCampMode() {
+  const rsvp = isRsvp(document.getElementById('event_date').value);
+  const helping = document.getElementById('helping').value;
+
+  document.getElementById('attending-row').style.display = rsvp ? 'block' : 'none';
+  document.getElementById('attending').required = rsvp;
+
+  // RSVP camps are attendance-only: no helping question.
+  // Clearing `required` matters — a hidden required field blocks submit.
+  document.getElementById('helping-row').style.display = rsvp ? 'none' : 'block';
+  document.getElementById('helping').required = !rsvp;
+  if (rsvp) {
+    document.getElementById('helping-other-row').style.display = 'none';
+    const other = document.getElementById('helping_other');
+    other.required = false; other.value = '';
+  }
+
+  // On RSVP camps the food fields replace firewood entirely.
+  document.getElementById('firewood-donation-row').style.display = rsvp ? 'none' : 'flex';
+  document.getElementById('brings-firewood-row').style.display =
+    (!rsvp && (helping === 'setup' || helping === 'both')) ? 'block' : 'none';
+
+  if (rsvp) {
+    document.getElementById('brings_firewood').checked = false;
+    document.getElementById('firewood_donation').checked = false;
+    document.getElementById('firewood-amount-row').classList.remove('visible');
+    const amt = document.getElementById('firewood_amount');
+    amt.required = false; amt.value = '';
+  }
+}
+document.getElementById('event_date').addEventListener('change', applyCampMode);
 function populateDateDropdown() {
   const sel = document.getElementById('event_date');
   sel.innerHTML = '<option value="">-- choose one --</option>' +
     EVENT_DATES.map(d => `<option value="${escHtml(d)}">${escHtml(d)}</option>`).join('');
 }
 populateDateDropdown();
+applyCampMode();
 
 // helping select → show/hide sub-fields
 document.getElementById('helping').addEventListener('change', function() {
   const firewoodRow = document.getElementById('brings-firewood-row');
   const otherRow    = document.getElementById('helping-other-row');
   const otherInput  = document.getElementById('helping_other');
-  const showFirewood = this.value === 'setup' || this.value === 'both';
+  const showFirewood = !isRsvp(document.getElementById('event_date').value)
+                    && (this.value === 'setup' || this.value === 'both');
   firewoodRow.style.display = showFirewood ? 'block' : 'none';
   if (!showFirewood) document.getElementById('brings_firewood').checked = false;
   otherRow.style.display = this.value === 'other' ? 'block' : 'none';
@@ -523,13 +597,15 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
   e.preventDefault();
   const form    = e.target;
   const donating = form.firewood_donation.checked;
+  const rsvp = isRsvp(form.event_date.value.trim());
   const row = {
     name:            form.name.value.trim(),
     event_date:      form.event_date.value.trim(),
-    helping:         form.helping.value,
-    firewood_amount: donating ? parseInt(form.firewood_amount.value, 10) || 0 : 0,
-    brings_firewood: form.brings_firewood.checked,
-    helping_other:   form.helping.value === 'other' ? form.helping_other.value.trim() : null,
+    attending:       rsvp ? document.getElementById('attending').value : null,
+    helping:         rsvp ? 'rsvp' : form.helping.value,
+    firewood_amount: rsvp ? 0 : (donating ? parseInt(form.firewood_amount.value, 10) || 0 : 0),
+    brings_firewood: rsvp ? false : form.brings_firewood.checked,
+    helping_other:   (!rsvp && form.helping.value === 'other') ? form.helping_other.value.trim() : null,
   };
   setStatus('submitting...', 'inf');
   form.querySelector('.submit-btn').disabled = true;
@@ -540,6 +616,8 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     document.getElementById('firewood-amount-row').classList.remove('visible');
     document.getElementById('brings-firewood-row').style.display = 'none';
     document.getElementById('helping-other-row').style.display   = 'none';
+    populateDateDropdown();
+    applyCampMode();
     await loadAndRender();
   } catch(err) {
     setStatus(`❌ ${err.message}`, 'err');
